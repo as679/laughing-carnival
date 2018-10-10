@@ -14,10 +14,6 @@
   roles:
   - servers
 
-- hosts: kalis
-  roles:
-  - kalis
-
 - hosts: jumpbox
   roles:
   - jumpbox

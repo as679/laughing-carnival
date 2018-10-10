@@ -2,18 +2,18 @@
 #
 
 data "template_file" "server_userdata" {
-  count    = "${var.student_count}"
+  count    = "${var.server_count}"
   template = "${file("${path.module}/userdata/server.userdata")}"
 
   vars {
-    hostname = "${var.id}_student${count.index + 1}_server"
+    hostname = "${var.id}-server${count.index + 1}"
     jump_ip  = "${aws_instance.jump.private_ip}"
     number   = "${count.index + 1}"
   }
 }
 
 resource "aws_instance" "server" {
-  count                  = "${var.student_count}"
+  count                  = "${var.server_count}"
   ami                    = "${lookup(var.ami_centos, var.aws_region)}"
   availability_zone      = "${lookup(var.aws_az, var.aws_region)}"
   instance_type          = "${var.flavour_centos}"
@@ -26,10 +26,10 @@ resource "aws_instance" "server" {
   depends_on             = ["aws_instance.jump"]
 
   tags {
-    Name  = "${var.id}_student${count.index + 1}_server"
+    Name  = "${var.id}-server${count.index + 1}"
     Owner = "${var.owner}"
     Lab_Group = "servers"
-    Lab_Name = "server.student${count.index + 1}.lab"
+    Lab_Name = "server${count.index + 1}.lab"
   }
 
   root_block_device {

@@ -18,9 +18,14 @@ variable "student_count" {
   default     = 2
 }
 
+variable "server_count" {
+  description = "The class size. Each student gets a controller / server pairing"
+  default     = 4
+}
+
 variable "id" {
   description = "A prefix for the naming of the objects / instances"
-  default     = "aviWAF"
+  default     = "aviK8S"
 }
 
 variable "owner" {
