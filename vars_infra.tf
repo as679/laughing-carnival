@@ -13,7 +13,7 @@ variable "base_ip" {
 
 variable "flavour_centos" {
   description = "AWS instance type for servers etc"
-  default     = "t2.medium"
+  default     = "t2.xlarge"
 }
 
 variable "flavour_avi" {
