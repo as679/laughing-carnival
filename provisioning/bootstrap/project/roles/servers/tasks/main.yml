@@ -2,6 +2,16 @@
 - hostname:
     name: "{{ inventory_hostname }}"
 - lineinfile:
+    path: /etc/resolv.conf
+    regexp: '(^search .*$)'
+    line: '\1 lab'
+    backrefs: yes
+- lineinfile:
+    path: /etc/resolv.conf
+    regexp: '(^nameserver).*$'
+    line: "\1 {{ hostvars['jumpbox.lab']['privateIp'] }}"
+    backrefs: yes
+- lineinfile:
     dest: /etc/yum.conf
     regexp: ''
     insertafter: EOF

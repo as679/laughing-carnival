@@ -20,7 +20,7 @@ variable "student_count" {
 
 variable "server_count" {
   description = "The class size. Each student gets a controller / server pairing"
-  default     = 4
+  default     = 5
 }
 
 variable "id" {

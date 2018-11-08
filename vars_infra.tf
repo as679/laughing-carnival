@@ -23,7 +23,7 @@ variable "flavour_avi" {
 
 variable "vol_size_centos" {
   description = "Volume size for instances in G"
-  default     = "15"
+  default     = "25"
 }
 
 variable "vol_size_avi" {
