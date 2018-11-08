@@ -1,1 +1,21 @@
 ---
+- yum:
+    name: dnsmasq
+    state: present
+- lineinfile:
+    line: local=/lab/
+    insertafter: '^#local=.*$'
+    path: /etc/dnsmasq.conf
+    state: present
+- systemd:
+    name: dnsmasq
+    enabled: yes
+    state: restarted
+- git:
+    repo: https://github.com/openshift/openshift-ansible.git
+    dest: /opt/openshift-ansible
+    version: release-3.11
+- template:
+    dest: /opt/openshift-ansible/ocp_inventory
+    src: ocp_inventory.j2
+

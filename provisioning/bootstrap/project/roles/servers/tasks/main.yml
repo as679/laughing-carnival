@@ -1,4 +1,6 @@
 ---
+- hostname:
+    name: "{{ inventory_hostname }}"
 - lineinfile:
     dest: /etc/yum.conf
     regexp: ''

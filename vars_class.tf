@@ -25,7 +25,7 @@ variable "server_count" {
 
 variable "id" {
   description = "A prefix for the naming of the objects / instances"
-  default     = "aviK8S"
+  default     = "aviOCP"
 }
 
 variable "owner" {
