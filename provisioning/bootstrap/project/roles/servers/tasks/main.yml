@@ -2,16 +2,6 @@
 - hostname:
     name: "{{ inventory_hostname }}"
 - lineinfile:
-    path: /etc/resolv.conf
-    regexp: '(^search .*$)'
-    line: '\1 lab'
-    backrefs: yes
-- lineinfile:
-    path: /etc/resolv.conf
-    regexp: '(^nameserver).*$'
-    line: "\1 {{ hostvars['jumpbox.lab']['privateIp'] }}"
-    backrefs: yes
-- lineinfile:
     dest: /etc/yum.conf
     regexp: ''
     insertafter: EOF
@@ -21,6 +11,7 @@
     state: present
   with_items:
   - docker
+  - NetworkManager
 - pip:
     name: "{{ item }}"
     extra_args: --proxy {{ hostvars['jumpbox.lab']['privateIp'] }}:3128
@@ -32,9 +23,22 @@
     insertafter: EOF
     line: HTTP_PROXY="http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128"
 - systemd:
-    name: docker
+    name: {{ item }}
     enabled: yes
     state: restarted
+  with_items:
+  - docker
+  - NetworkManager
+- lineinfile:
+    path: /etc/resolv.conf
+    regexp: '(^search .*$)'
+    line: '\1 lab'
+    backrefs: yes
+- lineinfile:
+    path: /etc/resolv.conf
+    regexp: '(^nameserver).*$'
+    line: "\1 {{ hostvars['jumpbox.lab']['privateIp'] }}"
+    backrefs: yes
 #- copy:
 #    src: kubernetes.repo
 #    dest: /etc/yum.repos.d/kubernetes.repo

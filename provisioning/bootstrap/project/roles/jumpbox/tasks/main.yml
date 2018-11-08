@@ -18,4 +18,7 @@
 - template:
     dest: /opt/openshift-ansible/ocp_inventory
     src: ocp_inventory.j2
+- template:
+    dest: /opt/openshift-ansible/dnsmasq-snippet.conf
+    src: dnsmasq-snippet.j2
 

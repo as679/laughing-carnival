@@ -17,6 +17,8 @@ openshift_release="3.11"
 openshift_pkg_version="-3.11.0"
 openshift_image_tag="v3.11.0"
 
+openshift_node_dnsmasq_additional_config_file=/opt/openshift-ansible/dnsmasq-snippet.conf
+
 # SSH user, this user should allow ssh based auth without requiring a password
 ansible_ssh_user=root
 
