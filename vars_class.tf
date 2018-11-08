@@ -15,7 +15,7 @@ variable "avi_backup_admin_password" {}
 
 variable "student_count" {
   description = "The class size. Each student gets a controller / server pairing"
-  default     = 2
+  default     = 1
 }
 
 variable "server_count" {

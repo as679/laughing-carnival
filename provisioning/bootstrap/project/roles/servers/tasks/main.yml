@@ -23,7 +23,7 @@
     insertafter: EOF
     line: HTTP_PROXY="http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128"
 - systemd:
-    name: {{ item }}
+    name: "{{ item }}"
     enabled: yes
     state: restarted
   with_items:
@@ -37,7 +37,7 @@
 - lineinfile:
     path: /etc/resolv.conf
     regexp: '(^nameserver).*$'
-    line: "\1 {{ hostvars['jumpbox.lab']['privateIp'] }}"
+    line: '\1 {{ hostvars[''jumpbox.lab''][''privateIp''] }}'
     backrefs: yes
 #- copy:
 #    src: kubernetes.repo
