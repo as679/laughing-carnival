@@ -23,14 +23,14 @@
     name: docker
     enabled: yes
     state: restarted
-- copy:
-    src: kubernetes.repo
-    dest: /etc/yum.repos.d/kubernetes.repo
-- selinux:
-    state: disabled
-- shell: |
-    yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-- systemd:
-    name: kubelet
-    enabled: yes
-    state: restarted
+#- copy:
+#    src: kubernetes.repo
+#    dest: /etc/yum.repos.d/kubernetes.repo
+#- selinux:
+#    state: disabled
+#- shell: |
+#    yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+#- systemd:
+#    name: kubelet
+#    enabled: yes
+#    state: restarted
