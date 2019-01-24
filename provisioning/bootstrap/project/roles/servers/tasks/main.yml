@@ -1,52 +1,82 @@
 ---
-- hostname:
-    name: "{{ inventory_hostname }}"
 - lineinfile:
     dest: /etc/yum.conf
     regexp: ''
     insertafter: EOF
-    line: proxy=http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128
+    line: proxy=http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
+- command: subscription-manager config --server.proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }} --server.proxy_port=3128
+- lineinfile:
+    dest: /etc/rhsm/rhsm.conf  
+    regexp: "{{ item.regexp }}"
+    insertafter: EOF
+    line: "{{ item.line }}" 
+  loop:
+  - { regexp: '^proxy_hostname', line: "proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }}" } 
+  - { regexp: '^proxy_port', line: 'proxy_port=3128' }
+- command: subscription-manager repos --enable={{ item }}
+  loop:
+  - rhel-7-server-rpms
+  - rhel-7-server-extras-rpms  
+  - rhel-7-server-ose-3.11-rpms
+  - rhel-7-server-ansible-2.6-rpms 
+  - rhel-7-fast-datapath-rpms
 - yum:
     name: "{{ item }}"
     state: present
   with_items:
   - docker
-  - NetworkManager
+  - wget
+  - net-tools 
+  - bind-utils
+  - yum-utils
+  - iptables-services
+  - bridge-utils 
+  - bash-completion
+  - kexec-tools
+  - sos
+  - psacct    
 - pip:
     name: "{{ item }}"
-    extra_args: --proxy {{ hostvars['jumpbox.lab']['privateIp'] }}:3128
+    extra_args: --proxy {{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
   with_items:
   - docker
 - lineinfile:
     dest: /etc/sysconfig/docker
     regexp: ''
     insertafter: EOF
-    line: HTTP_PROXY="http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128"
+    line: HTTP_PROXY="http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128"
 - systemd:
-    name: "{{ item }}"
+    name: docker
     enabled: yes
     state: restarted
+- docker_image:
+    name: "{{ item }}"
+    state: present
   with_items:
-  - docker
-  - NetworkManager
-- lineinfile:
-    path: /etc/resolv.conf
-    regexp: '(^search .*$)'
-    line: '\1 lab'
-    backrefs: yes
-- lineinfile:
-    path: /etc/resolv.conf
-    regexp: '(^nameserver).*$'
-    line: '\1 {{ hostvars[''jumpbox.lab''][''privateIp''] }}'
-    backrefs: yes
-#- copy:
-#    src: kubernetes.repo
-#    dest: /etc/yum.repos.d/kubernetes.repo
-#- selinux:
-#    state: disabled
-#- shell: |
-#    yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-#- systemd:
-#    name: kubelet
-#    enabled: yes
-#    state: restarted
+  - bkimminich/juice-shop
+  - citizenstig/dvwa
+  - smarunich/avinetworks-demo
+# - docker_container:
+#     name: avinetworks-demo
+#     image: smarunich/avinetworks-demo
+#     ports:
+#      - 80:80
+#      - 443:443
+#     detach: true
+#     state: started
+# - docker_container:
+#     name: shop
+#     image: bkimminich/juice-shop
+#     ports:
+#      - 8080:3000
+#     detach: true
+#     state: started
+# - docker_container:
+#     name: dvwa
+#     image: citizenstig/dvwa
+#     ports:
+#      - 8081:80
+#     detach: true
+#     state: started
+#     env:
+#       MYSQL_PASS: "Chang3ME!"

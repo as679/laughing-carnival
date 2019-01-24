@@ -20,3 +20,4 @@ output "Controller_PrivateIP" {
 output "Server_PrivateIP" {
   value = "${aws_instance.server.*.private_ip}"
 }
+

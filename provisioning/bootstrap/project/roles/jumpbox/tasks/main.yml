@@ -1,24 +1,83 @@
 ---
+- command: subscription-manager repos --enable={{ item }}
+  loop:
+  - rhel-7-server-rpms
+  - rhel-7-server-extras-rpms
+  - rhel-7-server-ose-3.11-rpms
+  - rhel-7-server-ansible-2.6-rpms
+  - rhel-7-fast-datapath-rpms
+- pip:
+    name: "{{ item }}"
+  loop:
+  - ansible==2.6.12
 - yum:
-    name: dnsmasq
+    name: "{{ item }}"
     state: present
+  with_items:
+  - docker
+  - dnsmasq
+  - bind-utils
+  - openshift-ansible
+  - atomic
 - lineinfile:
-    line: local=/lab/
-    insertafter: '^#local=.*$'
-    path: /etc/dnsmasq.conf
-    state: present
+    dest: /etc/dnsmasq.conf
+    insertafter: EOF
+    line: server=/app.{{hostvars[item]['student_domain']}}/{{hostvars[item]['dns_vs_ip']}}
+  when:
+  - hostvars[item]['Lab_Group'] == "controllers"
+  with_inventory_hostnames: all
 - systemd:
-    name: dnsmasq
+    name: "{{ item }}"
     enabled: yes
     state: restarted
-- git:
-    repo: https://github.com/openshift/openshift-ansible.git
-    dest: /opt/openshift-ansible
-    version: release-3.11
+  loop:
+  - docker
+  - dnsmasq
+- lineinfile:
+    dest: /etc/resolv.conf
+    insertbefore: BOF
+    line: nameserver 127.0.0.1
+- file:
+    path: /opt/bootstrap/openshift-ansible
+    state: directory
+- lineinfile:
+    dest: /opt/bootstrap/openshift-ansible/dnsmasq-snippet.conf
+    insertafter: EOF
+    create: yes
+    line: server=/lab/{{ hostvars['jumpbox.student.lab']['privateIp'] }}
 - template:
-    dest: /opt/openshift-ansible/ocp_inventory
     src: ocp_inventory.j2
-- template:
-    dest: /opt/openshift-ansible/dnsmasq-snippet.conf
-    src: dnsmasq-snippet.j2
+    dest: /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }}
+    owner: root
+    group: wheel
+    mode: 0644
+  when:
+  - hostvars[item]['Lab_Group'] == "controllers"
+  with_inventory_hostnames: all
+- copy:
+    src: openshift-ansible-tmux.sh
+    dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
+    owner: root
+    mode: 0755
+- lineinfile:
+    dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
+    insertafter: EOF
+    regexp: ^tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
+    line: tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
+  when:
+  - hostvars[item]['Lab_Group'] == "controllers"
+  with_inventory_hostnames: all
+- lineinfile:
+    dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
+    insertafter: EOF
+    regexp: ^#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
+    line: \#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
+  when:
+  - hostvars[item]['Lab_Group'] == "controllers"
+  with_inventory_hostnames: all
+- lineinfile:
+    dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
+    insertafter: EOF
+    regexp: ^#ansible-playbook /opt/bootstrap/project/post_install_ocp.yml
+    line: '#ansible-playbook /opt/bootstrap/project/post_install_ocp.yml'
 

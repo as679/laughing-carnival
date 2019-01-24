@@ -12,15 +12,22 @@ variable "avi_default_password" {}
 variable "avi_admin_password" {}
 variable "avi_backup_admin_username" {}
 variable "avi_backup_admin_password" {}
+variable "ocp_oreg_auth_user" {}
+variable "ocp_oreg_auth_password" {}
 
 variable "student_count" {
-  description = "The class size. Each student gets a controller / server pairing"
-  default     = 1
+  description = "The class size. Each student gets a controller"
+  default     = 2
 }
 
 variable "server_count" {
-  description = "The class size. Each student gets a controller / server pairing"
-  default     = 5
+  description = "The class size. Students get a shared servers"
+  default     = 3
+}
+
+variable "master_count" {
+  description = "The class size. Students get a shared servers"
+  default     = 1
 }
 
 variable "id" {
@@ -30,7 +37,7 @@ variable "id" {
 
 variable "owner" {
   description = "Sets the AWS Owner tag appropriately"
-  default     = "Training"
+  default     = "aviOCP_Training"
 }
 
 variable "aws_az" {
@@ -39,7 +46,7 @@ variable "aws_az" {
 
   default = {
     us-west-2 = "us-west-2a"
-    eu-west-2 = "eu-west-2a"
+    eu-west-1 = "eu-west-1a"
   }
 }
 

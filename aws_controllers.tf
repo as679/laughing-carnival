@@ -6,7 +6,7 @@ data "template_file" "controller_userdata" {
   template = "${file("${path.module}/userdata/controller.userdata")}"
 
   vars {
-    hostname = "${var.id}-controller${count.index + 1}"
+    hostname = "${var.id}-student${count.index + 1}-controller"
     jump_ip  = "${aws_instance.jump.private_ip}"
     number   = "${count.index + 1}"
   }
@@ -27,10 +27,10 @@ resource "aws_instance" "ctrl" {
   depends_on                  = ["aws_instance.server"]
 
   tags {
-    Name  = "${var.id}-controller${count.index + 1}"
+    Name  = "${var.id}_student${count.index + 1}_controller"
     Owner = "${var.owner}"
     Lab_Group = "controllers"
-    Lab_Name = "controller${count.index + 1}.lab"
+    Lab_Name = "controller.student${count.index + 1}.lab"
     ansible_connection = "local"
   }
 

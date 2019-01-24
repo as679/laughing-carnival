@@ -6,42 +6,37 @@ etcd
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
-openshift_additional_repos=[{'id': 'centos-paas', 'name': 'centos-paas', 'baseurl' :'https://buildlogs.centos.org/centos/7/paas/x86_64/openshift-origin311', 'gpgcheck' :'0', 'enabled' :'1'}]
-openshift_http_proxy=http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128/
-openshift_https_proxy=http://{{ hostvars['jumpbox.lab']['privateIp'] }}:3128/
-openshift_no_proxy='.lab'
-openshift_generate_no_proxy_hosts=True
-openshift_disable_check=disk_availability,docker_storage
-#openshift_node_bootstrap=false
-openshift_release="3.11"
-openshift_pkg_version="-3.11.0"
-openshift_image_tag="v3.11.0"
-
-openshift_node_dnsmasq_additional_config_file=/opt/openshift-ansible/dnsmasq-snippet.conf
-
 # SSH user, this user should allow ssh based auth without requiring a password
 ansible_ssh_user=root
 
 # If ansible_ssh_user is not root, ansible_become must be set to true
 #ansible_become=true
 
-openshift_deployment_type=origin
+openshift_deployment_type=openshift-enterprise
+#oreg_url=example.com/openshift3/ose-${component}:${version}
+openshift_master_default_subdomain=app.{{ hostvars[item]['student_domain'] }}
+oreg_auth_user={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_user'] }}
+oreg_auth_password={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_password'] }}
+openshift_examples_modify_imagestreams=true
+openshift_disable_check=disk_availability,docker_storage
+openshift_node_dnsmasq_additional_config_file=/opt/bootstrap/openshift-ansible/dnsmasq-snippet.conf
+openshift_http_proxy=http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
+openshift_https_proxy=http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
 
-# uncomment the following to enable htpasswd authentication; defaults to AllowAllPasswordIdentityProvider
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
-
+# openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/opt/openshift-ansible/htpasswd'}]
 # host group for masters
 [masters]
-server1.lab
+master1.{{ hostvars[item]['student_domain'] }}
 
 # host group for etcd
 [etcd]
-server1.lab
+master1.{{ hostvars[item]['student_domain'] }}
 
 # host group for nodes, includes region info
 [nodes]
-server1.lab openshift_schedulable=true openshift_hostname=server1.lab openshift_node_group_name='node-config-master'
-server2.lab openshift_hostname=server2.lab openshift_node_group_name='node-config-infra'
-server3.lab openshift_hostname=server3.lab openshift_node_group_name='node-config-infra'
-server4.lab openshift_hostname=server4.lab openshift_node_group_name='node-config-compute'
-server5.lab openshift_hostname=server4.lab openshift_node_group_name='node-config-compute'
+master1.{{ hostvars[item]['student_domain'] }} openshift_node_group_name='node-config-master'
+server1.{{ hostvars[item]['student_domain'] }} openshift_node_group_name='node-config-infra' openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+server2.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-infra' openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+server3.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-compute' openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
