@@ -24,10 +24,12 @@
     name: "{{ item }}"
     state: present
   with_items:
+  - bind-utils
+  - vim
+  - tmux
   - docker
   - wget
   - net-tools 
-  - bind-utils
   - yum-utils
   - iptables-services
   - bridge-utils 
