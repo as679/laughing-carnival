@@ -14,6 +14,7 @@ variable "avi_backup_admin_username" {}
 variable "avi_backup_admin_password" {}
 variable "ocp_oreg_auth_user" {}
 variable "ocp_oreg_auth_password" {}
+variable "ocp_rhsm_pool_id" {}
 
 variable "student_count" {
   description = "The class size. Each student gets a controller"

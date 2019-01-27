@@ -1,4 +1,8 @@
 ---
+- command: subscription-manager register --force --username={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_user'] }} --password={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_password'] }}
+  ignore_errors: true
+- command: subscription-manager attach --pool={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_pool_id'] }}
+  ignore_errors: true
 - command: subscription-manager repos --enable={{ item }}
   loop:
   - rhel-7-server-rpms
@@ -6,6 +10,7 @@
   - rhel-7-server-ose-3.11-rpms
   - rhel-7-server-ansible-2.6-rpms
   - rhel-7-fast-datapath-rpms
+  ignore_errors: true
 - pip:
     name: "{{ item }}"
   loop:
@@ -83,4 +88,3 @@
     insertafter: EOF
     regexp: ^#ansible-playbook /opt/bootstrap/project/post_install_ocp.yml
     line: '#ansible-playbook /opt/bootstrap/project/post_install_ocp.yml'
-

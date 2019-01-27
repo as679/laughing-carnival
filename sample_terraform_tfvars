@@ -7,6 +7,7 @@ avi_backup_admin_username = ""
 avi_backup_admin_password = ""
 ocp_oreg_auth_user = ""
 ocp_oreg_auth_password = ""
+ocp_rhsm_pool_id= ""
 student_count = 2
 key = ""
 id = "aviOCP"

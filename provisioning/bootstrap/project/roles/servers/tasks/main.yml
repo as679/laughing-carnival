@@ -5,21 +5,26 @@
     insertafter: EOF
     line: proxy=http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
 - command: subscription-manager config --server.proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }} --server.proxy_port=3128
+- command: subscription-manager register --force --username={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_user'] }} --password={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_password'] }}
+  ignore_errors: true
+- command: subscription-manager attach --pool={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_pool_id'] }}
+  ignore_errors: true
 - lineinfile:
-    dest: /etc/rhsm/rhsm.conf  
+    dest: /etc/rhsm/rhsm.conf
     regexp: "{{ item.regexp }}"
     insertafter: EOF
-    line: "{{ item.line }}" 
+    line: "{{ item.line }}"
   loop:
-  - { regexp: '^proxy_hostname', line: "proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }}" } 
+  - { regexp: '^proxy_hostname', line: "proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }}" }
   - { regexp: '^proxy_port', line: 'proxy_port=3128' }
 - command: subscription-manager repos --enable={{ item }}
   loop:
   - rhel-7-server-rpms
-  - rhel-7-server-extras-rpms  
+  - rhel-7-server-extras-rpms
   - rhel-7-server-ose-3.11-rpms
-  - rhel-7-server-ansible-2.6-rpms 
+  - rhel-7-server-ansible-2.6-rpms
   - rhel-7-fast-datapath-rpms
+  ignore_errors: true
 - yum:
     name: "{{ item }}"
     state: present
@@ -29,14 +34,14 @@
   - tmux
   - docker
   - wget
-  - net-tools 
+  - net-tools
   - yum-utils
   - iptables-services
-  - bridge-utils 
+  - bridge-utils
   - bash-completion
   - kexec-tools
   - sos
-  - psacct    
+  - psacct
 - pip:
     name: "{{ item }}"
     extra_args: --proxy {{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
