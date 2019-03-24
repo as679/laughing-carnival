@@ -37,6 +37,6 @@ master1.{{ hostvars[item]['student_domain'] }}
 # host group for nodes, includes region info
 [nodes]
 master1.{{ hostvars[item]['student_domain'] }} openshift_node_group_name='node-config-master'
-server1.{{ hostvars[item]['student_domain'] }} openshift_node_group_name='node-config-infra' openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-server2.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-infra' openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-server3.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-compute' openshift_node_labels="{'region': 'primary', 'zone': 'default'}"
+server1.{{ hostvars[item]['student_domain'] }} openshift_node_group_name='node-config-infra'
+server2.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-infra'
+server3.{{hostvars[item]['student_domain']}} openshift_node_group_name='node-config-compute'

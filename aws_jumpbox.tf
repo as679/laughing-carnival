@@ -40,10 +40,14 @@ resource "aws_instance" "jump" {
     Lab_ocp_oreg_auth_user = "${var.ocp_oreg_auth_user}"
     Lab_ocp_oreg_auth_password = "${var.ocp_oreg_auth_password}"
     Lab_ocp_rhsm_pool_id = "${var.ocp_rhsm_pool_id}"
+    Lab_ocp_rhsm_org = "${var.ocp_rhsm_org}"
+    Lab_ocp_rhsm_activationkey = "${var.ocp_rhsm_activationkey}"
     Lab_avi_backup_admin_username = "${var.avi_backup_admin_username}"
     Lab_avi_backup_admin_password = "${var.avi_backup_admin_password}"
     Lab_avi_management_network = "${var.id}_management_network"
     Lab_avi_vip_network = "${var.id}_infra_network"
+    Lab_Timezone = "${var.lab_timezone}"
+    Lab_Noshut = "jumpbox"
   }
 
   root_block_device {

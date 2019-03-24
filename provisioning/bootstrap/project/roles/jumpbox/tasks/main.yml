@@ -1,4 +1,5 @@
 ---
+#- command: subscription-manager register --force --org={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_org'] }} --activationkey={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_activationkey'] }}
 - command: subscription-manager register --force --username={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_user'] }} --password={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_password'] }}
   ignore_errors: true
 - command: subscription-manager attach --pool={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_pool_id'] }}
@@ -48,20 +49,6 @@
 - file:
     path: /opt/bootstrap/openshift-ansible
     state: directory
-- lineinfile:
-    dest: /opt/bootstrap/openshift-ansible/dnsmasq-snippet.conf
-    insertafter: EOF
-    create: yes
-    line: server=/lab/{{ hostvars['jumpbox.student.lab']['privateIp'] }}
-- template:
-    src: ocp_inventory.j2
-    dest: /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }}
-    owner: root
-    group: wheel
-    mode: 0644
-  when:
-  - hostvars[item]['Lab_Group'] == "controllers"
-  with_inventory_hostnames: all
 - copy:
     src: openshift-ansible-tmux.sh
     dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
@@ -70,16 +57,16 @@
 - lineinfile:
     dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
     insertafter: EOF
-    regexp: ^tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
-    line: tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
+    regexp: ^tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} "ssh master1.{{ hostvars[item]['student_domain'] }} ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
+    line: tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ssh master1.{{ hostvars[item]['student_domain'] }} ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml; bash -i"
   when:
   - hostvars[item]['Lab_Group'] == "controllers"
   with_inventory_hostnames: all
 - lineinfile:
     dest: /opt/bootstrap/openshift-ansible/openshift-ansible-tmux.sh
     insertafter: EOF
-    regexp: ^#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
-    line: \#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
+    regexp: ^#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ssh master1.{{ hostvars[item]['student_domain'] }} ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
+    line: \#tmux new-window -t openshift-ansible:{{ hostvars[item]['student_id'] }} -n openshift-ansible-{{ hostvars[item]['student_domain'] }} "ssh master1.{{ hostvars[item]['student_domain'] }} ansible-playbook -i /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }} /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml; bash -i"
   when:
   - hostvars[item]['Lab_Group'] == "controllers"
   with_inventory_hostnames: all

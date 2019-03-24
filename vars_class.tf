@@ -21,6 +21,10 @@ variable "student_count" {
   default     = 2
 }
 
+variable "lab_timezone" {
+  description = "Lab Timezone: PST, EST, GMT or SGT"
+}
+
 variable "server_count" {
   description = "The class size. Students get a shared servers"
   default     = 3
@@ -55,3 +59,14 @@ variable "key" {
   description = "AWS SSH keypair name"
   default     = "training-access"
 }
+
+variable "ocp_rhsm_org" {
+  description = "RedHat Subscription Manager Org"
+  default = "avi_ocp"
+}
+
+variable "ocp_rhsm_activationkey" {
+  description = "RedHat Subscription Manager OCP activation key"
+  default = "avi_ocpkey"
+}
+

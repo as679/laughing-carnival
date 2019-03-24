@@ -1,10 +1,15 @@
 ---
 - lineinfile:
+    dest: /etc/resolv.conf
+    insertbefore: BOF
+    line: nameserver {{ hostvars['jumpbox.student.lab']['privateIp'] }}
+- lineinfile:
     dest: /etc/yum.conf
     regexp: ''
     insertafter: EOF
     line: proxy=http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
 - command: subscription-manager config --server.proxy_hostname={{ hostvars['jumpbox.student.lab']['privateIp'] }} --server.proxy_port=3128
+#- command: subscription-manager register --force --org={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_org'] }} --activationkey={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_activationkey'] }}
 - command: subscription-manager register --force --username={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_user'] }} --password={{ hostvars['jumpbox.student.lab']['Lab_ocp_oreg_auth_password'] }}
   ignore_errors: true
 - command: subscription-manager attach --pool={{ hostvars['jumpbox.student.lab']['Lab_ocp_rhsm_pool_id'] }}
@@ -32,7 +37,6 @@
   - bind-utils
   - vim
   - tmux
-  - docker
   - wget
   - net-tools
   - yum-utils
@@ -42,48 +46,27 @@
   - kexec-tools
   - sos
   - psacct
-- pip:
-    name: "{{ item }}"
-    extra_args: --proxy {{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128
-  with_items:
-  - docker
+  - openshift-ansible
+  - atomic
+- file:
+    path: /opt/bootstrap/openshift-ansible
+    state: directory
+  when:
+  - inventory_hostname is search("master1")
 - lineinfile:
-    dest: /etc/sysconfig/docker
-    regexp: ''
+    dest: /opt/bootstrap/openshift-ansible/dnsmasq-snippet.conf
     insertafter: EOF
-    line: HTTP_PROXY="http://{{ hostvars['jumpbox.student.lab']['privateIp'] }}:3128"
-- systemd:
-    name: docker
-    enabled: yes
-    state: restarted
-- docker_image:
-    name: "{{ item }}"
-    state: present
-  with_items:
-  - bkimminich/juice-shop
-  - citizenstig/dvwa
-  - smarunich/avinetworks-demo
-# - docker_container:
-#     name: avinetworks-demo
-#     image: smarunich/avinetworks-demo
-#     ports:
-#      - 80:80
-#      - 443:443
-#     detach: true
-#     state: started
-# - docker_container:
-#     name: shop
-#     image: bkimminich/juice-shop
-#     ports:
-#      - 8080:3000
-#     detach: true
-#     state: started
-# - docker_container:
-#     name: dvwa
-#     image: citizenstig/dvwa
-#     ports:
-#      - 8081:80
-#     detach: true
-#     state: started
-#     env:
-#       MYSQL_PASS: "Chang3ME!"
+    create: yes
+    line: server=/lab/{{ hostvars['jumpbox.student.lab']['privateIp'] }}
+  when:
+  - inventory_hostname is search("master1")
+- template:
+    src: ocp_inventory.j2
+    dest: /opt/bootstrap/openshift-ansible/ocp_inventory_{{ hostvars[item]['student_domain'] }}
+    owner: root
+    group: wheel
+    mode: 0644
+  when:
+  - hostvars[item]['Lab_Group'] == "controllers"
+  - inventory_hostname is search("master1")
+  with_inventory_hostnames: all

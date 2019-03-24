@@ -15,7 +15,7 @@ resource "aws_instance" "server" {
   count                  = "${var.server_count * var.student_count}"
   ami                    = "${lookup(var.ami_centos, var.aws_region)}"
   availability_zone      = "${lookup(var.aws_az, var.aws_region)}"
-  instance_type          = "${var.flavour_centos}"
+  instance_type          = "${var.flavour_server}"
   key_name               = "${var.key}"
   vpc_security_group_ids = ["${aws_security_group.jumpsg.id}"]
   subnet_id              = "${aws_subnet.privnet.id}"
@@ -29,6 +29,7 @@ resource "aws_instance" "server" {
     Owner = "${var.owner}"
     Lab_Group = "servers"
     Lab_Name = "server${(count.index / var.student_count % var.server_count) + 1}.student${count.index % var.student_count + 1}.lab"
+    Lab_Timezone = "${var.lab_timezone}"
   }
 
   root_block_device {

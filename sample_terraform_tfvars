@@ -8,7 +8,12 @@ avi_backup_admin_password = ""
 ocp_oreg_auth_user = ""
 ocp_oreg_auth_password = ""
 ocp_rhsm_pool_id= ""
+# Optional if activation key is used
+# ocp_rhsm_org= ""
+# ocp_rhsm_activationkey= ""
 student_count = 2
+# Lab Timezone: EST, PST, GMT or SGT
+lab_timezone = "EST" 
 key = ""
 id = "aviOCP"
 vpc_cidr = "172.20.0.0/16"

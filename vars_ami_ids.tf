@@ -7,8 +7,8 @@ variable "ami_avi_controller" {
   description = "Avi AMI by region updated 07/01/19"
 
   default = {
-    eu-west-1 = "ami-08e9261d1137c972c" #17.2.14
-    us-west-2 = "ami-0b90c7bdd7a7b777f" #17.2.14
+    eu-west-1 = "ami-072e0c55a6dc19cd1" #18.2.2
+    us-west-2 = "ami-0ef13f76789a1223b" #18.2.2
   }
 }
 
@@ -23,6 +23,5 @@ variable "ami_centos" {
   default = {
     eu-west-1 = "ami-0defbd4ca292ce6e5"
     us-west-2 = "ami-01161bd085729d109"
-    #us-west-2 = "ami-01cd2786f990efdf5"
   }
 }

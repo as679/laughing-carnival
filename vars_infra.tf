@@ -6,14 +6,24 @@ variable "vpc_cidr" {
   default     = "172.20.0.0/16"
 }
 
+variable "flavour_master" {
+  description = "AWS instance type for servers etc"
+  default     = "t3.xlarge"
+}
+
+variable "flavour_server" {
+  description = "AWS instance type for servers etc"
+  default     = "t3.large"
+}
+
 variable "flavour_centos" {
   description = "AWS instance type for servers etc"
-  default     = "m4.xlarge"
+  default     = "t3.medium"
 }
 
 variable "flavour_avi" {
   description = "AWS instance type for Avi controllers"
-  default     = "c4.2xlarge"
+  default     = "t3.2xlarge"
 }
 
 variable "vol_size_centos" {
